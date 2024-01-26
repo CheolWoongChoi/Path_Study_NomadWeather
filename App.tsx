@@ -2,8 +2,31 @@ import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
 const { width: SCREEN_WIDTH, height } = Dimensions.get("screen");
 
+const DAYS = [3, 5, 10, 15, 20, 25, 30];
+const TEMPS = [-5, 0, 10, 4, 5, 20, 30, -15, 40];
+const DESCRIPTIONS = [
+  "Sunny",
+  "Cloudy",
+  "Rainy",
+  "Snowy",
+  "Windy",
+  "Foggy",
+  "Dusty",
+  "Stormy",
+  "Hail",
+  "Sleet",
+  "Hot",
+  "Cold",
+];
+
+const WEATHERS = Array.from({ length: 10 }, () => ({
+  day: DAYS[Math.floor(Math.random() * DAYS.length)],
+  temp: TEMPS[Math.floor(Math.random() * TEMPS.length)],
+  description: DESCRIPTIONS[Math.floor(Math.random() * DESCRIPTIONS.length)],
+}));
+
 export default function App() {
-  console.log(SCREEN_WIDTH, height);
+  // console.log(SCREEN_WIDTH, height);
 
   return (
     <View style={styles.container}>
@@ -16,26 +39,13 @@ export default function App() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.weather}
       >
-        <View style={styles.day}>
-          <Text style={styles.temp}>27</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temp}>27</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temp}>27</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temp}>27</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temp}>27</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
+        {WEATHERS.map(({ day, temp, description }, index) => (
+          <View key={"weather-" + index} style={styles.day}>
+            <Text style={styles.dayText}>{day}th</Text>
+            <Text style={styles.temp}>{temp}&deg;</Text>
+            <Text style={styles.description}>{description}</Text>
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -64,12 +74,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // backgroundColor: "#9A94BC",
   },
+  dayText: {
+    marginTop: 15,
+    fontSize: 50,
+  },
   temp: {
-    marginTop: 50,
-    fontSize: 178,
+    marginTop: 20,
+    fontSize: 60,
   },
   description: {
-    marginTop: -30,
+    marginTop: -10,
     fontSize: 60,
   },
 });
