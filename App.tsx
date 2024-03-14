@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Fontisto } from "@expo/vector-icons";
+
 import {
   StyleSheet,
   Text,
@@ -8,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
+import { MOCK_WEATHERS, MockWeather } from "./mocks";
 
 const { width: SCREEN_WIDTH, height } = Dimensions.get("screen");
 
@@ -17,63 +20,22 @@ const { width: SCREEN_WIDTH, height } = Dimensions.get("screen");
 const API_KEY = "882caf0420ba65193c159ecbdd932bd9";
 
 /**
- *
+ * 아이콘들
  */
-const MOCK_CURRENT_WEATHER = {
-  coord: {
-    lon: 10.99,
-    lat: 44.34,
-  },
-  weather: [
-    {
-      id: 501,
-      main: "Rain",
-      description: "moderate rain",
-      icon: "10d",
-    },
-  ],
-  base: "stations",
-  main: {
-    temp: Math.random() * 15, // 임시로 바꿈
-    feels_like: 298.74,
-    temp_min: 297.56,
-    temp_max: 300.05,
-    pressure: 1015,
-    humidity: 64,
-    sea_level: 1015,
-    grnd_level: 933,
-  },
-  visibility: 10000,
-  wind: {
-    speed: 0.62,
-    deg: 349,
-    gust: 1.18,
-  },
-  rain: {
-    "1h": 3.16,
-  },
-  clouds: {
-    all: 100,
-  },
-  dt: 1661870592,
-  sys: {
-    type: 2,
-    id: 2075663,
-    country: "IT",
-    sunrise: 1661834187,
-    sunset: 1661882248,
-  },
-  timezone: 7200,
-  id: 3163858,
-  name: "Zocca",
-  cod: 200,
-} as const;
-
-type CurrentWeather = typeof MOCK_CURRENT_WEATHER;
+const icons = {
+  Clouds: "cloudy",
+  Sunny: "day-sunny",
+  Clear: "day-sunny",
+  Snow: "snow",
+  Rain: "rains",
+  Drizzle: "rain",
+  Thunder: "lightning",
+  Atmosphere: "cloudy-gusts",
+};
 
 export default function App() {
   const [city, setCity] = useState("Loading...");
-  const [days, setDays] = useState<CurrentWeather[]>([]);
+  const [days, setDays] = useState<MockWeather[]>([]);
 
   const [ok, setOk] = useState(true);
 
@@ -98,12 +60,12 @@ export default function App() {
       setCity(city || region + " " + street || "Not Found!");
 
       // API_KEY가 invalid라고 뜸
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
-      );
-      const json = await response.json();
+      // const response = await fetch(
+      //   `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
+      // );
+      // const json = await response.json();
 
-      setDays([MOCK_CURRENT_WEATHER]);
+      setDays(MOCK_WEATHERS);
     }
   };
 
@@ -133,15 +95,35 @@ export default function App() {
         ) : (
           days.map((day, index) => (
             <View key={`day-${index}`} style={styles.day}>
-              <Text style={styles.temp}>
-                {parseFloat(String(day.main.temp)).toFixed(1)}&deg;
-              </Text>
-              <Text style={styles.description}>
-                {day.weather?.[0].main || "No Weather"}
-              </Text>
-              <Text style={styles.tinyText}>
-                {day.weather?.[0].description}
-              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Text style={styles.temp}>
+                  {parseFloat(String(day.main.temp)).toFixed(1)}&deg;
+                </Text>
+                <Fontisto
+                  name={icons[day.weather[0].main]}
+                  size={68}
+                  color="white"
+                />
+              </View>
+              <View
+                style={{
+                  marginTop: 20,
+                }}
+              >
+                <Text style={styles.description}>
+                  {day.weather[0].main || "No Weather"}
+                </Text>
+                <Text style={styles.tinyText}>
+                  {day.weather?.[0].description}
+                </Text>
+              </View>
             </View>
           ))
         )}
@@ -158,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#CDF7F6",
   },
   city: {
-    flex: 0.5,
+    flex: 1,
     backgroundColor: "#8FB8DE",
     justifyContent: "center",
     alignItems: "center",
@@ -171,7 +153,7 @@ const styles = StyleSheet.create({
   day: {
     width: SCREEN_WIDTH,
     alignItems: "center",
-    // backgroundColor: "#9A94BC",
+    color: "white",
   },
   dayText: {
     marginTop: 15,
