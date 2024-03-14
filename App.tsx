@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
+import * as Location from "expo-location";
 
 const { width: SCREEN_WIDTH, height } = Dimensions.get("screen");
 
@@ -26,12 +28,40 @@ const WEATHERS = Array.from({ length: 10 }, () => ({
 }));
 
 export default function App() {
-  // console.log(SCREEN_WIDTH, height);
+  const [city, setCity] = useState("Loading...");
+  const [location, setLocation] = useState();
+  const [ok, setOk] = useState(true);
+
+  const ask = async () => {
+    const { granted } = await Location.requestForegroundPermissionsAsync();
+
+    if (!granted) {
+      setOk(false);
+    }
+
+    const {
+      coords: { latitude, longitude },
+    } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+    const location = await Location.reverseGeocodeAsync(
+      { latitude, longitude },
+      { useGoogleMaps: false }
+    );
+
+    if (location?.[0]) {
+      const { city, region, street } = location[0];
+      // 도시가 없으면, region을 보여줌
+      setCity(city || region + " " + street || "Not Found!");
+    }
+  };
+
+  useEffect(() => {
+    ask();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.city}>
-        <Text style={styles.cityName}>Seoul</Text>
+        <Text style={styles.cityName}>{city}</Text>
       </View>
       <ScrollView
         horizontal
@@ -65,7 +95,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cityName: {
-    fontSize: 70,
+    fontSize: 33,
     fontWeight: "500",
   },
   weather: {},
